@@ -38,6 +38,22 @@ def check_is_valid(line, global_map):
     
 	return int(items[int((length - 1) / 2)])
 
+
+def bubble_sort_with_lookup(line, global_map):
+	items = [i for i in line.strip().split(",")]
+	length = len(items)
+
+	for i in range(length):
+		for j in range(0, length - i - 1):
+			curr_n = items[j]
+			next_n = items[j + 1]
+			if global_map[curr_n][next_n] == 'before':
+				items[j], items[j + 1] = next_n, curr_n
+
+	print(items)
+	return int(items[int((length - 1) / 2)])
+
+
 sum = 0
 
 with open(idir, "r") as f:
@@ -48,7 +64,10 @@ with open(idir, "r") as f:
 			update_map(line, global_map)
 
 		if "," in line:
-			sum += check_is_valid(line, global_map)
+			res = check_is_valid(line, global_map)
+
+			if res == 0:
+				sum += bubble_sort_with_lookup(line, global_map)
 
 		line = f.readline()
 
