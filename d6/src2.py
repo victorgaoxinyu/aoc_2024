@@ -35,57 +35,39 @@ def print_grid_with_marker(grid, markers, char):
 	for row in grid_with_markers:
 		print("".join(row))
 
-def simulate_guard(grid, start_pos, obstacle=None):
-	row, col = start_pos
-	state_history = set()
-	visited = set()
-	dir_idx = 0
-	steps = 0
-	max_steps = 10000
-	valid = True
 
-	while (row, col, dir_idx) not in state_history and steps < max_steps:
-		state_history.add((row, col, dir_idx))
-		visited.add((row, col))
+def simulate_guard(grid, start_pos, obstacle):
+	visited = set()
+	row, col = start_pos
+	dir_idx = 0
+
+	while (True):
+		if (row, col, dir_idx) in visited:
+			return True
+
+		visited.add((row, col, dir_idx))
 		next_r = row + directions[dir_idx][0]
 		next_c = col + directions[dir_idx][1]
 
-		# print(f"Curr: {row, col, dir_idx}, Next: {next_r, next_c}")
-
 		if not (0 <= next_r < rows and 0 <= next_c < cols):
-			valid = False
-			break
+			return False
 
 		if (next_r, next_c) == obstacle or grid[next_r][next_c] == "#":
 			dir_idx = (dir_idx + 1) % 4
 		else:
 			row, col = next_r, next_c
 
-		steps += 1
-
-	return visited, valid
-
 def find_best_obstacle(grid, start_pos):
 
-	visited, _ = simulate_guard(grid, start_pos)
-	print(f"Origin: {len(visited)}")
-
-	# print_grid_with_marker(grid, visited, "X")
-
-	best_obstacle = None
-	max_visited = len(visited)
 	cnt = 0
 
 	candidate_positions = [(i, j) for i, row in enumerate(grid) for j, cell in enumerate(row) if cell == "."]
 	print(len(candidate_positions))
-	# print_grid_with_marker(grid, candidate_positions, "O")
 
 	for obs in tqdm(candidate_positions, total=len(candidate_positions)):
-		visited, valid = simulate_guard(grid, start_pos, obs)
-		if len(visited) < max_visited and valid:
-			print(obs, valid)
-			# print_grid_with_marker(grid, visited, "X")
-			print("<" * 20)
+		valid = simulate_guard(grid, start_pos, obs)
+		if valid:
+			print(obs)
 			cnt += 1
 	return cnt
 
