@@ -9,6 +9,18 @@ with open(idir, "r") as f:
 
 ROWS = len(grid)
 COLS = len(grid[0])
+print(ROWS, COLS)
+
+
+def print_grid_with_marker(grid, markers, char):
+	grid_with_markers = [list(row) for row in grid]
+	for row, col in markers:
+		grid_with_markers[row][col] = char
+
+
+	for row in grid_with_markers:
+		print("".join(row))
+
 
 def find_antenna(grid):
 	rows = len(grid)
@@ -44,27 +56,64 @@ def get_antinodes(a1, a2):
 
 	return ant1, ant2
 
+def get_valid_antinodes_q2(a1, a2):
+	uniq_res = set()
+	w_diff = a2[1] - a1[1]
+	h_diff = a2[0] - a1[0]
+
+	n = 1
+	while True:
+		ant_left = (a1[0] - h_diff * n, a1[1] - w_diff * n)
+		if valid_antinodes(ant_left):
+			uniq_res.add(ant_left)
+			n += 1
+		else:
+			n = 1
+			break
+
+	while True:
+		ant_right = (a2[0] + h_diff * n, a2[1] + w_diff * n)
+		if valid_antinodes(ant_right):
+			uniq_res.add(ant_right)
+			n += 1
+		else:
+			break
+
+	return uniq_res
+
+
 res = find_antenna(grid)
-pprint(res)
 
 antinode_res = {}
 uniq_res = set()
 
+# for type, antennas in res.items():
+# 	antinode_res[type] = []
+# 	combinations = list(itertools.combinations(antennas, 2))
+# 	for comb in combinations:
+# 		ant1, ant2 = get_antinodes(comb[0], comb[1])
+# 		if valid_antinodes(ant1):
+# 			antinode_res[type].append(ant1)
+# 			uniq_res.add(ant1)
+
+# 		if valid_antinodes(ant2):
+# 			antinode_res[type].append(ant2)
+# 			uniq_res.add(ant2)
+
+# pprint(antinode_res)
+# print(uniq_res)
+# print(len(uniq_res))
+
+cnt = 0
 for type, antennas in res.items():
-	antinode_res[type] = []
 	combinations = list(itertools.combinations(antennas, 2))
 	for comb in combinations:
-		ant1, ant2 = get_antinodes(comb[0], comb[1])
-		if valid_antinodes(ant1):
-			antinode_res[type].append(ant1)
-			uniq_res.add(ant1)
+		tmp_res = get_valid_antinodes_q2(comb[0], comb[1])
+		cnt += len(tmp_res)
+		uniq_res = uniq_res | tmp_res | antennas  # include antennas!
 
-		if valid_antinodes(ant2):
-			antinode_res[type].append(ant2)
-			uniq_res.add(ant2)
-
-pprint(antinode_res)
 print(uniq_res)
 print(len(uniq_res))
-# ant1, ant2 = get_antinodes((2, 5), (3, 7))
-# print(ant1, ant2)
+
+# print_grid_with_marker(grid, uniq_res, "#")
+
