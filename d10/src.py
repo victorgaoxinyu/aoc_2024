@@ -9,6 +9,28 @@ ROWS = len(grid)
 COLS = len(grid[0])
 print(ROWS, COLS)
 
+
+def find_next_position_v2(curr_position, counter):
+	row = curr_position[0]
+	col = curr_position[1]
+	curr_value = grid[row][col]
+	
+	directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+	if curr_value == "9":
+		counter[0] += 1
+		return
+
+	for d in directions:
+		next_row = row + d[0]
+		next_col = col + d[1]
+		if 0 <= next_row < ROWS and 0 <= next_col < COLS:
+			next_value = grid[next_row][next_col]
+			if next_value == str(int(curr_value) + 1):
+				print(f"Next: ({next_row, next_col}), {next_value}")
+				find_next_position_v2((next_row, next_col), counter)
+
+
 def find_next_position(curr_position, end_point):
 	row = curr_position[0]
 	col = curr_position[1]
@@ -46,7 +68,28 @@ def part1(grid):
 
 	return end_points, score
 
-end_points, score = part1(grid)
 
-print(end_points)
+def part2(grid):
+	rows = len(grid)
+	cols = len(grid[0])
+	score = 0
+	for row_idx in range(rows):
+		for col_idx in range(cols):
+			curr = grid[row_idx][col_idx]
+			if curr == "0":
+				counter = [0]
+				find_next_position_v2((row_idx, col_idx), counter)
+				print(counter)
+				score += counter[0]
+
+	return score
+
+
+# end_points, score = part1(grid)
+
+# print(end_points)
+# print(score)
+
+
+score = part2(grid)
 print(score)
