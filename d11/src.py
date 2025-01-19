@@ -4,6 +4,35 @@ with open(idir, "r") as f:
 	line = [int(i) for i in f.readline().split(" ")]
 
 
+def split_number(n):
+	half = len(str(n)) // 2
+	left = int(str(n)[:half])
+	right = int(str(n)[half:])
+	return left, right
+
+
+def count_stones_after_blinks(n, blinks, memo):
+
+	if blinks == 0:
+		return 1
+	if (n, blinks) in memo:
+		return memo[(n, blinks)]
+
+	if n == 0:
+		result = count_stones_after_blinks(1, blinks - 1, memo)
+	elif len(str(n)) % 2 == 0:
+		left, right = split_number(n)
+		result = (
+			count_stones_after_blinks(left, blinks - 1, memo) + 
+			count_stones_after_blinks(right, blinks - 1, memo)
+			)
+	else:
+		new_value = n * 2024
+		result = count_stones_after_blinks(new_value, blinks - 1, memo)
+
+	memo[(n, blinks)] = result
+	return result
+
 
 def blink_inplace(l):
 	i = 0
@@ -46,11 +75,17 @@ def blink(l):
 
 print(line)
 
-it = 0
-iter_times = 75
+# it = 0
+# iter_times = 75
 
-while it < iter_times:
-	print(it)
-	blink_inplace(line)
-	it += 1
-print(len(line))
+# while it < iter_times:
+# 	print(it)
+# 	blink_inplace(line)
+# 	it += 1
+# print(len(line))
+
+memo = {}
+blinks = 75
+total = sum(count_stones_after_blinks(s, blinks, memo) for s in line)
+
+print(total)
